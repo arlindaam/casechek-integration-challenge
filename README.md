@@ -7,18 +7,8 @@ I structured the solutions as one reusable parser function that accepts a raw HL
 I kept the logic modular by using helper functions for field extraction, component parsing, value cleanup, surgery-side parsing, and implant parsing. I chose this structure because it makes the code easier to read, easier to explain, and easier to extend for future HL7 variations. 
 
 ## Assumptions
-Where the prompt left room for interpretation, I favored a consistent output shape, preservation of partial data, and minimal transformation beyond the stated business rules.
-
-- `surgerySides` is always returned as an array, even if there is only one side.
-- `scheduling` uses SCH-25 component 2, which is the descriptive status value.
-- `surgeryDateTime` is returned in raw HL7 timestamp format.
-- An implant record gets `parseError: true` when any required implant field cannot be reliably extracted:
-  - missing description
-  - missing quantity
-  - non-numeric quantity
-  - missing lot number
-- `requiresReview` is only set when quantity is successfully parsed and is greater than 2.
-- For MSH, I handled the standard HL7 indexing offset separately because MSH-1 is the field separator.
+. scheduling should use the descriptive status, not the shorthand code
+I decided to use SCH-25 component 2 as the final scheduling value, so outputs become things like Scheduled, Cancelled, and Booked rather than Sch, Can, or Bkd. I made that choice because the field map explicitly points to SCH-25 (component 2) for scheduling, and component 2 is the clearer business-friendly value.
 
 ## HL7 Context
 In a real hospital integration, this SIU message would likely be received from an EHR by an integration engine such as Qvera QIE. My JavaScript function would fit in the transformation/validation stage before the data is sent downstream to Casechek in structured form. 
