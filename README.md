@@ -7,7 +7,7 @@ I structured the solutions as one reusable parser function that accepts a raw HL
 I kept the logic modular by using helper functions for field extraction, component parsing, value cleanup, surgery-side parsing, and implant parsing. I chose this structure because it makes the code easier to read, easier to explain, and easier to extend for future HL7 variations. 
 
 ## Assumptions
-Where the prompt left room for interpretation, I favored a consistent output shape, preservation of partial data, and minimal transformation beyond the states business rules.
+Where the prompt left room for interpretation, I favored a consistent output shape, preservation of partial data, and minimal transformation beyond the stated business rules.
 
 - `surgerySides` is always returned as an array, even if there is only one side.
 - `scheduling` uses SCH-25 component 2, which is the descriptive status value.
