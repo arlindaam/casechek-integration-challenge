@@ -7,8 +7,37 @@ I structured the solutions as one reusable parser function that accepts a raw HL
 I kept the logic modular by using helper functions for field extraction, component parsing, value cleanup, surgery-side parsing, and implant parsing. I chose this structure because it makes the code easier to read, easier to explain, and easier to extend for future HL7 variations. 
 
 ## Assumptions
-. scheduling should use the descriptive status, not the shorthand code
-I decided to use SCH-25 component 2 as the final scheduling value, so outputs become things like Scheduled, Cancelled, and Booked rather than Sch, Can, or Bkd. I made that choice because the field map explicitly points to SCH-25 (component 2) for scheduling, and component 2 is the clearer business-friendly value.
+Where the prompt left room for interpretation, I favored a consistent output shape, preservation of partial data, and minimal transformation beyond the stated business rules.
+
+1. **Scheduling uses the descriptive status value.**  
+I used `SCH-25` component 2 for the `scheduling` field, which produces values like `Scheduled`, `Cancelled`, and `Booked` instead of shorthand values like `Sch`, `Can`, or `Bkd`. I chose this because the field mapping explicitly points to `SCH-25 (component 2)`, and component 2 is the clearer business-facing value. 
+
+2. **`surgerySides` is always returned as an array.**  
+Even when only one side is present, I return it as an array such as `["Left"]` or `["Bilateral"]`. I made this decision because the expected output shape shows `surgerySides` as an array, so keeping that structure consistent avoids mixing strings and arrays across messages.
+
+3. **HL7 timestamps stay in raw HL7 format.**  
+I kept `surgeryDateTime` in the original HL7 timestamp format from `AIS-4` instead of converting it into a JavaScript date or a more human-readable format. I chose that because the prompt specifies the source field but does not ask for date reformatting, and leaving it unchanged avoids introducing assumptions about time zones or formatting standards.
+
+4. **Malformed implant rows are still included.**  
+If an implant NTE line is missing a description, missing a lot number, missing a quantity, or contains a non-numeric quantity, I still include it in the `implants` array. Any value that cannot be reliably extracted is set to `null`, and the record gets `parseError: true`. I made this decision because the business rules explicitly say malformed implant rows should still be included rather than dropped.
+
+5. **`parseError` means a required implant field is missing or invalid.**  
+I treated an implant row as unparseable when any core implant field could not be reliably extracted: missing description, missing quantity, non-numeric quantity, or missing lot number. I chose that interpretation because the prompt specifically lists those kinds of issues as examples of malformed or unparseable implant data. 
+
+6. **`requiresReview` is only set when quantity is a valid integer greater than 2.**  
+I only set `requiresReview: true` when quantity was successfully parsed as an integer and that integer was greater than 2. If quantity was malformed, I left `requiresReview` as false instead of guessing. I chose that because the rule says to flag implants with a quantity greater than 2, which requires the quantity to be parseable first. 
+
+7. **Non-implant NTE segments are excluded from the main output except for counting.**  
+NTE segments that are neither implant lines nor the procedure description are not added to the `implants` array or the `procedureDescription` field. Instead, they are counted in `meta.unrecognizedNteCount`. I followed that approach because the business rules explicitly say to exclude those NTE segments while tracking how many were found. 
+
+8. **The Primary AIP segment is used for surgeon information.**  
+When multiple `AIP` segments are present, I use the one marked `Primary` to populate `surgeonId`, `surgeonGivenName`, and `surgeonFamilyName`. If none is clearly marked, I fall back to the first AIP segment as defensive handling. I chose this because the field mapping says surgeon data should come from the Primary Surgeon AIP segment. 
+
+9. **The parser is reusable across all provided HL7 messages.**  
+I designed the solution as one parser function that accepts any incoming HL7 message string rather than writing separate logic for each sample file. I made that decision because the challenge asks for a JavaScript function plus test cases, which suggests the sample HL7 files are meant to validate one reusable solution.
+
+10. **Blank values are normalized to `null`.**  
+When a field is present but empty, I normalize it to `null` rather than leaving it as an empty string. I chose that because it creates a cleaner and more consistent JSON output, and it matches the prompt’s instruction to set unextractable implant fields to `null`.
 
 ## HL7 Context
 In a real hospital integration, this SIU message would likely be received from an EHR by an integration engine such as Qvera QIE. My JavaScript function would fit in the transformation/validation stage before the data is sent downstream to Casechek in structured form. 
