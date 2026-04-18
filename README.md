@@ -2,7 +2,7 @@
 This project contains a JavaScript parser that transforms HL7 SIU messages into clean JSON output based on the provided business rules.  
 # Casechek Technical Integration Challenge
 ## Approach
-I structured the solutions as one reusable parser function that acceptes a raw HL7 SIU message string and returns one clean JSON object in the expected shape. I first split the message into segments and fields, then extracted the required case-level values using the provided field mapping, identified the primary surgeon and procedure description, and parsed implant NTE lines intro structured implant objects. 
+I structured the solutions as one reusable parser function that accepts a raw HL7 SIU message string and returns one clean JSON object in the expected shape. I first split the message into segments and fields, then extracted the required case-level values using the provided field mapping, identified the primary surgeon and procedure description, and parsed implant NTE lines intro structured implant objects. 
 
 I kept the logic modular by using helper functions for field extraction, component parsing, value cleanup, surgery-side parsing, and implant parsing. I chose this structure because it makes the code easier to read, easier to explain, and easier to extend for future HL7 variations. 
 
