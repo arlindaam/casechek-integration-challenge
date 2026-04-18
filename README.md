@@ -1,4 +1,4 @@
-# casechek-integration-challenge
+# casechek-technical-challenge
 This project contains a JavaScript parser that transforms HL7 SIU messages into clean JSON output based on the provided business rules.  
 # Casechek Technical Integration Challenge
 ## Approach
