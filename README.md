@@ -25,7 +25,7 @@ In a real hospital integration, this SIU message would likely be received from a
 
 The message might arrive as a raw HL7 string through MLLP, a file drop, or an API-driven workflow. 
 
-If I were new to Qvera, I would first learn:
+I would approach Qvera by learning:
 - How messages are received and routed
 - Where JavaScript runs in the pipeline
 - How retries and error queues are handled
