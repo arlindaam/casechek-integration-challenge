@@ -40,23 +40,13 @@ I designed the solution as one parser function that accepts any incoming HL7 mes
 When a field is present but empty, I normalize it to `null` rather than leaving it as an empty string. I chose that because it creates a cleaner and more consistent JSON output, and it matches the prompt’s instruction to set unextractable implant fields to `null`.
 
 ## HL7 Context
-In a real hospital integration, this SIU message would likely be received from an EHR by an integration engine such as Qvera QIE. My JavaScript function would fit in the transformation/validation stage before the data is sent downstream to Casechek in structured form. 
+In a real hospital integration, I would expect this SIU^S14 message to originate in the hospital’s EHR and pass through an integration engine such as Qvera before reaching Casechek. My JavaScript function would fit into the transformation stage of that pipeline, after the message is received and routed but before the data is sent downstream in structured form. Its role would be to extract the required scheduling and implant data, apply the business rules, and return clean JSON that Casechek can ingest.
+ 
+By the time my code runs, I would expect to be working with the HL7 message in its original text form, since the parser is designed to read the segments and delimiters directly.
 
-The message might arrive as a raw HL7 string through MLLP, a file drop, or an API-driven workflow. 
+Because I have not worked directly with Qvera before, my approach would be to learn it from the standpoint of where custom parsing logic fits into the overall interface workflow. I would first want to understand how messages are received, where transformation code runs, how errors are logged, and how failed messages are retried or replayed. 
 
-I would approach Qvera by learning:
-- How messages are received and routed
-- Where JavaScript runs in the pipeline
-- How retries and error queues are handled
-- What logging and observability are available
-- Whether downstream systems expect raw HL7, JSON, or both
-
-Before building a production integration, I would ask:
-- Are multiple AIS/AIL/AIP segments possible?
-- Can implant details appear outside NTE?
-- Are repeated fields expected?
-- What should happen when required case-level fields are missing?
-- What is the retry/error-handling strategy?
+Before building a production integration, I would want clear answers on the expected input format, how to handle missing or malformed fields, whether implant details always arrive in NTE segments, and how duplicate or out-of-order scheduling messages should be managed downstream. 
 
 ## Edge Cases
 If this were going into production, I would also want to handle:
