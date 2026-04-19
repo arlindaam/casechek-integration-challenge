@@ -49,15 +49,7 @@ Because I have not worked directly with Qvera before, my approach would be to le
 Before building a production integration, I would want clear answers on the expected input format, how to handle missing or malformed fields, whether implant details always arrive in NTE segments, and how duplicate or out-of-order scheduling messages should be managed downstream. 
 
 ## Edge Cases
-If this were going into production, I would also want to handle:
-- Malformed line delimiters
-- Missing required segments
-- Duplicate segment types
-- Repeated HL7 fields/components
-- Unexpected implant formatting
-- Messages arriving out of order
-- Duplicate case updates / idempotency
-- Status updates that overwrite earlier scheduling data
+If this were going into production, I would want to harden the parser beyond the sample cases by planning for message variations and operational edge cases that are common in real integrations. That would include malformed or inconsistent segment delimiters, missing required segments, duplicate segment types, repeated fields, and messages that arrive out of order or represent updates to an existing case rather than a brand-new event. I would also want to think through idempotency, so the same message is not processed twice, and establish clear rules for what should be accepted with warnings versus what should be flagged for review. In a real environment, the goal would not just be to parse the HL7 successfully, but to make the integration reliable when incoming data is incomplete, inconsistent, or operationally messy.
 
 ## Testing
 To verify this in a live environment, I would:
