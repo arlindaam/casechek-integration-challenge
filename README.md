@@ -40,9 +40,7 @@ I designed the solution as one parser function that accepts any incoming HL7 mes
 When a field is present but empty, I normalize it to `null` rather than leaving it as an empty string. I chose that because it creates a cleaner and more consistent JSON output, and it matches the prompt’s instruction to set unextractable implant fields to `null`.
 
 ## HL7 Context
-In a real hospital integration, I would expect this SIU^S14 message to originate in the hospital’s EHR and pass through an integration engine such as Qvera before reaching Casechek. My JavaScript function would fit into the transformation stage of that pipeline, after the message is received and routed but before the data is sent downstream in structured form. Its role would be to extract the required scheduling and implant data, apply the business rules, and return clean JSON that Casechek can ingest.
- 
-By the time my code runs, I would expect to be working with the HL7 message in its original text form, since the parser is designed to read the segments and delimiters directly.
+In a real hospital integration, I would expect this SIU^S14 message to originate in the hospital’s EHR and pass through an integration engine such as Qvera before reaching Casechek. My JavaScript function would fit into the transformation stage of that pipeline, after the message is received and routed but before the data is sent downstream in structured form. Its role would be to extract the required scheduling and implant data, apply the business rules, and return clean JSON that Casechek can ingest. By the time my code runs, I would expect to be working with the HL7 message in its original text form, since the parser is designed to read the segments and delimiters directly.
 
 Because I have not worked directly with Qvera before, my approach would be to learn it from the standpoint of where custom parsing logic fits into the overall interface workflow. I would first want to understand how messages are received, where transformation code runs, how errors are logged, and how failed messages are retried or replayed. 
 
