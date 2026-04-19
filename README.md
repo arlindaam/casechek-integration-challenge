@@ -2,9 +2,9 @@
 This project contains a JavaScript parser that transforms HL7 SIU messages into clean JSON output based on the provided business rules.  
 # Casechek Technical Integration Challenge
 ## Approach
-I structured the solutions as one reusable parser function that accepts a raw HL7 SIU message string and returns one clean JSON object in the expected shape. I first split the message into segments and fields, then extracted the required case-level values using the provided field mapping, identified the primary surgeon and procedure description, and parsed implant NTE lines intro structured implant objects. 
+I structured the solution as one reusable parser function that takes a raw HL7 SIU message and returns a clean JSON object in the exact shape the challenge asked for. I wanted the flow of the code to match the transformation itself: first split the message into segments and fields, then extract the required case-level values from the mapped HL7 locations, then handle the implant NTE lines separately, since that is the most variable part of the message. This felt like the clearest way to turn raw HL7 text into structured data that Casechek could actually use.
 
-I kept the logic modular by using helper functions for field extraction, component parsing, value cleanup, surgery-side parsing, and implant parsing. I chose this structure because it makes the code easier to read, easier to explain, and easier to extend for future HL7 variations. 
+Within that parser, I broke the logic into smaller helper functions for field access, component parsing, cleanup, and implant parsing rather than putting everything into one long block. I chose that structure because it made the code easier to read, easier to explain, and easier to apply the business rules consistently, especially around malformed implant data. I also wrote the parser to work across all of the provided HL7 examples rather than designing it around one specific file, because that felt closer to how a real integration would need to behave.
 
 ## Assumptions
 Where the prompt left room for interpretation, I favored a consistent output shape, preservation of partial data, and minimal transformation beyond the stated business rules.
